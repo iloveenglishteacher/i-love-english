@@ -54,6 +54,9 @@ h1{margin:2px 0 0;font-weight:900;font-size:28px;letter-spacing:.06em;text-wrap:
 .ruler i{position:absolute;inset:0 auto 0 0;width:100%;background:#f2c94c;transition:width .45s ease,background .3s;mix-blend-mode:multiply}
 .ruler.low i{background:var(--red)}
 .gauge-note{font-size:11px;color:var(--pencil);margin:0 0 10px}
+.tier{align-self:center;font-size:12px;padding:1px 9px;border-radius:99px;border:1px solid var(--pencil);color:var(--pencil)}
+.tier.t認真{border-color:#b7791f;color:#b7791f}
+.tier.t地獄{border-color:var(--red);color:var(--paper);background:var(--red)}
 
 /* intro */
 .intro-lines{min-height:250px;display:flex;flex-direction:column;gap:6px;margin-top:18px}
@@ -210,6 +213,7 @@ h1{margin:2px 0 0;font-weight:900;font-size:28px;letter-spacing:.06em;text-wrap:
       <span>第 <b id="roundNo">0</b> 回合</span>
       <span>嗆贏 <b id="wins">0</b></span>
       <span>紀錄 <b id="best">0</b></span>
+      <span class="tier t暖身" id="tier">暖身</span>
     </div>
   </header>
 
@@ -218,7 +222,7 @@ h1{margin:2px 0 0;font-weight:900;font-size:28px;letter-spacing:.06em;text-wrap:
     <div class="ruler" id="ruler"><i id="hpFill"></i></div>
     <span id="hpNum">100</span>
   </div>
-  <p class="gauge-note">底氣歸零 = 被嘴到無話可說。每一回合老師的嘴砲都會消耗你的底氣，越後面越兇。</p>
+  <p class="gauge-note">底氣歸零 = 被嘴到無話可說。每回合都會被耗掉底氣，越後面越兇。第 5 回合起會出現聽起來很嗆、其實會被反嘴的陷阱選項。</p>
 
   <!-- INTRO -->
   <section id="intro">
@@ -503,6 +507,32 @@ const ROUNDS=[
 ["好……我會記下來，每一句都記住。",1,"Good。記在你那本什麼都沒寫的筆記本上。"],
 ["那可以借我抄一下老師的筆記嗎？",0,"我的筆記是 premium content，你付不起。"]]}
 ];
+const HARD=[
+{t:"你說你有預習？那 pronunciation 念給全班聽聽～",o:[["老師上週念成 pro-NOUN-ciation 耶。", 3, "蛤？那、那是在示範錯誤念法！Demonstration 懂不懂！"], ["黑板的 pronunciation 少一個 o。", -2, "親愛的，它本來就沒有那個 o。你剛剛親手幫我證明了喔～"], ["有預習又不代表一定要會念出來啊。", 2, "那你是預習了個寂寞喔？咩～"], ["我……我回家再好好練一下好了。", 1, "回家練？你家是有 native speaker 還是有奇蹟？"]]},
+{t:"期中考平均 52，我教得很好，是你們太弱～",o:[["隔壁班同一份考卷，平均 71 耶。", 3, "隔、隔壁班那是……他們比較會猜！Luck，懂嗎？"], ["老師平均算錯了吧，明明是 25。", -2, "52 跟 25 你也分不清？親愛的，數學也一起補吧～"], ["那老師要不要檢討一下教法？", 2, "我的教法是 award-winning 的。你沒聽過而已。"], ["我們會更努力的，對不起老師。", 1, "努力有用的話，你早就及格了啦～"]]},
+{t:"我講話中英夾雜？因為中文沒有那麼 precise 的詞。",o:[["那老師剛講的 meeting，中文叫開會。", 3, "……開會跟 meeting 的 nuance 不一樣好嗎！你不懂啦！"], ["precise 是名詞，老師詞性用錯了。", -2, "Precise 是形容詞喔，sweetie。用錯的是你～"], ["中文明明就很精準啊，老師。", 2, "那是你的中文程度剛好只夠用到那裡。"], ["喔……那我也來學中英夾雜好了。", 1, "你？你連一種語言都還沒搞定欸～"]]},
+{t:"你作文寫「Me and my friend go to...」，我看完直接想下班。",o:[["老師自介簡報寫 Me and my cat 耶。", 3, "那、那是 casual register！簡報跟作文不一樣啦！"], ["那句沒錯，me 本來就能當主詞。", -2, "Me 當主詞？親愛的，你的文法是自己發明的嗎～"], ["大家講話都這樣講，很正常啊。", 2, "大家都這樣講，大家都考不好，very consistent。"], ["那要改成 I and my friend 嗎？", 1, "My friend and I。看吧，你連改錯都改錯～"]]},
+{t:"上課滑手機？我在美國時，教授直接把手機丟出窗外。",o:[["老師上課滑蝦皮被校長看到那次呢？", 3, "那是在 research 教材！Online shopping 也是英文！"], ["在美國丟學生手機是違法的喔。", -2, "我又沒說丟學生的，教授丟的是他自己的啦～ 你抓不到重點耶。"], ["我在查單字啦，不是在滑手機。", 2, "查單字要開 IG？哪本字典長這樣～"], ["對不起，我現在馬上收起來。", 1, "收起來有什麼用，你的腦袋還是關機。"]]},
+{t:"我出的考題就是標準答案，有問題自己去查字典。",o:[["我查了，三本字典都說 B 也對耶。", 3, "那、那三本是美式字典，我教的是 British！"], ["老師的答案跟課本附的解答不一樣。", -2, "課本解答是我寫的喔親愛的。你拿我來打我？咩哈～"], ["標準答案也有可能出錯吧。", 2, "我出錯的機率，比你考滿分還低。"], ["好……那我回去再查查看。", 1, "查完記得跟我道歉，用英文。"]]},
+{t:"你頂嘴的樣子，就跟你的作文一樣，毫無邏輯。",o:[["老師評語寫邏輯不清，但沒寫哪裡。", 3, "……那是要讓你自己 reflect！我很忙的好嗎！"], ["那老師說說看，邏輯的英文是什麼？", -2, "Logic。L-O-G-I-C。你出這種題目是想幫我加分嗎～"], ["我覺得我剛剛講得很清楚了啊。", 2, "你覺得？你的「覺得」沒有參考價值。"], ["那……那我不講了，老師你贏了。", 1, "這是你今天最有邏輯的一句話。"]]},
+{t:"畢業旅行？以你的英文程度，去日本都會迷路。",o:[["去日本要講日文吧？老師先查地圖。", 3, "……我是說 international communication！英文是世界語言！"], ["日本人只講日文，英文根本沒用。", -2, "車站標示全都有英文喔～ 你出國大概真的會迷路。"], ["迷路就問人啊，又不會怎樣。", 2, "問人？用比手畫腳嗎？很有創意耶。"], ["那我跟團好了，比較安全一點。", 1, "對，跟緊導遊，千萬別開口。"]]},
+{t:"我不是在罵你，我是在 give you feedback。",o:[["老師的 feedback 都只有一個字：爛。", 3, "簡潔是一種美德！Less is more，懂？"], ["feedback 要加 s，老師用錯了。", -2, "Feedback 不可數喔親愛的。你又送我一分了～"], ["可是聽起來就是在罵人啊老師。", 2, "那是你的耳朵太敏感，不是我的問題。"], ["謝謝老師給我的寶貴 feedback……", 1, "不客氣。下次請 feedback 我一個及格分數。"]]},
+{t:"我 IG 有三千個 followers，你們懂什麼叫影響力？",o:[["那三千個有兩千個是國外賣鞋帳號。", 3, "那是 global audience！他們很 support 我好嗎！"], ["followers 是追蹤者，不是粉絲。", -2, "我沒說粉絲啊？你在跟空氣吵架嗎，sweetie～"], ["三千個好像也沒有很多吧，老師……", 2, "比你多啊。你有幾個？三個？家人帳號？"], ["哇，老師好紅，我可以追蹤嗎？", 1, "可以，但我不會回追。Standards，懂嗎？"]]},
+{t:"你寫「I am interesting in music」，你確定你 interesting？",o:[["老師的講義也寫 interesting in 耶。", 3, "那、那是 typo！講義跟作文的標準不一樣！"], ["interesting 跟 interested 一樣啦。", -2, "完全不一樣。你是 boring，我是 bored，懂了嗎～"], ["老師知道我想表達什麼就好了吧。", 2, "我知道，你想表達你很需要補習。"], ["那……I am interest in music？", 1, "越改越慘。Interested。E-D。"]]},
+{t:"我留美回來的，拒絕講台灣腔英文。",o:[["老師的 I think 都念成 I sink 耶。", 3, "那是……那是 Southern accent！很 authentic 的！"], ["老師留美才半年，根本不算留美。", -2, "半年也是 study abroad 啊。你連半天都沒有吧～"], ["台灣腔英文又沒有什麼不好的啊。", 2, "沒有不好，只是不夠好。像你一樣。"], ["那我要怎麼才能改掉台灣腔……", 1, "下輩子投胎到加州，比較快。"]]},
+{t:"你們這代閱讀量太少，英文才會這麼爛。",o:[["老師的推薦書單一半是電影原聲帶。", 3, "Soundtrack 也是 authentic input！你懂什麼語言習得？"], ["老師說過自己一年沒看完一本書。", -2, "我是說中文書。英文書我一個月三本喔，親愛的～"], ["閱讀又不一定要讀英文書吧。", 2, "那你讀中文書，英文會變好？Magic 嗎？"], ["我會多看書的……真的會。", 1, "你說的書是漫畫吧？我看到了喔。"]]},
+{t:"我的課，可是全校最多人選的喔～",o:[["因為老師的課是必修，沒得選啊。", 3, "……就、就算是選修，大家也會選我好嗎！"], ["全校最多人選的是體育課才對。", -2, "體育課是必修，不用選喔～ 你邏輯也要補了。"], ["人多也不代表教得好吧。", 2, "人多代表我受歡迎。你受歡迎過嗎？"], ["嗯……我也是上老師的課啦。", 1, "對啊，所以你更該感恩。"]]},
+{t:"Grammar 不好就算了，連手寫都像蚯蚓在跳舞。",o:[["老師板書小到第一排要用望遠鏡。", 3, "那是要訓練你們的 focus！我是用心良苦！"], ["老師說過字醜沒關係，內容最重要。", -2, "我說的是內容好的人字醜沒關係。你兩個都沒有～"], ["考試又不是在比書法，字醜又沒差。", 2, "對，但改考卷的也是人，人會生氣的。"], ["我下次會寫慢一點、工整一點……", 1, "寫慢一點，錯得更清楚。"]]},
+{t:"下課別來問我，我很忙，有問題問 Google。",o:[["那老師的薪水能分 Google 一半嗎？", 3, "……你這是 disrespectful！我要跟你導師說！"], ["「問 Google」文法錯，要用 ask。", -2, "我講的是中文啦親愛的。你的語言切換也壞掉了喔～"], ["問 Google 的話，那上課要幹嘛？", 2, "上課是來被我啟發的，不是來問笨問題的。"], ["好……那我以後都不打擾老師了。", 1, "Smart choice。終於有一個。"]]},
+{t:"你說你喜歡英文？喜歡跟會是兩件事喔，sweetie。",o:[["就像老師喜歡教書跟會教，兩件事。", 3, "蛤～？你現在是在 roast 我嗎？！我、我很會教好嗎！"], ["sweetie 是親愛的，對學生講很怪。", -2, "這叫 term of endearment，美國人都這樣講。你沒出過國吧～"], ["喜歡的話就會慢慢變會啊。", 2, "慢慢？你的慢慢是用世紀計算的嗎？"], ["那我……還是很喜歡英文啦。", 1, "單戀很辛苦喔，英文不會喜歡你的。"]]},
+{t:"我出的作業量很合理，是你們時間管理太差。",o:[["老師改作業都改三週，時間管理呢？", 3, "那、那是因為我很仔細！Quality takes time！"], ["法律規定作業不能超過一小時耶。", -2, "哪條法律？法條字號念給我聽～ 編的吧親愛的。"], ["其他科也都有作業啊，老師你知道嗎。", 2, "其他科我不管，我只在乎英文。也只在乎我。"], ["我……我會早一點開始寫的啦……", 1, "早點開始，早點寫錯。"]]},
+{t:"知道我為什麼不給你 A 嗎？因為 A 是給有才華的人。",o:[["那老師大學英文成績單有 A 嗎？", 3, "我……我們那時候是 GPA 制度！不一樣好嗎！"], ["老師說過 A 是給努力的人耶。", -2, "我說的是 A for Attitude，不是成績。你只聽一半喔～"], ["才華也是可以培養的吧。", 2, "可以，但你的培養皿是空的。"], ["那 B 可以嗎？B 也不錯啊……", 1, "B for Bad。好啊，送你。"]]},
+{t:"我說話直，是因為我 care 你們。",o:[["老師 care 的話，先記住我名字好嗎？", 3, "我、我記得啊……你是那個……那個 Lucky？……Lisa？"], ["care 是名詞，要說 care about 才對。", -2, "Care 也是動詞喔～ 我 care 你，你卻不 care 文法。"], ["care 的話，可以講好聽一點啊。", 2, "好聽的話，是留給有希望的學生的。"], ["謝謝老師這麼 care 我們大家。", 1, "不客氣。教學評鑑記得寫好話。"]]},
+{t:"你英文要是真的好，會考就不會只拿 B。",o:[["老師說過自己也考 B，還說會考不準。", 3, "那、那是另一個時代！題型不一樣！你不懂歷史！"], ["會考英文沒有 B，只有 A 跟 C。", -2, "會考有 A++ 到 C，B 也有喔。你連等級都搞不清～"], ["會考都還沒考，老師怎麼會知道。", 2, "我教書這麼久，一看就知道了。"], ["我……我會努力考到 A 的……", 1, "加油，奇蹟偶爾會發生。偶爾。"]]},
+{t:"這間教室裡最懂英文的人是誰？Say it～",o:[["是窗邊那位英文演講第一名的。", 3, "……那、那他也是我教出來的！So technically 是我！"], ["是 Google 翻譯，它比老師還準。", -2, "Google 翻譯把加油翻成 add oil 喔，親愛的～"], ["應該是老師吧……大概啦，我猜。", 2, "大概？把大概去掉，重講一次。"], ["是……是老師，當然是老師。", 1, "很好，大聲一點。全班都要聽到～"]]},
+{t:"你們那篇 essay，我只看第一段就決定分數了。",o:[["所以老師承認沒看完就打分數喔？", 3, "我……那是 expert intuition！有經驗的人看一眼就知道！"], ["essay 要叫 article，老師講錯了。", -2, "Essay 就是論說文喔。原來你連作文叫什麼都不知道～"], ["那我後面兩段是寫好玩的嗎？", 2, "對啊，寫給你自己看的。日記嘛。"], ["那我第一段寫好一點就好……", 1, "第一段寫好，後面就不用寫了？好聰明喔～"]]},
+{t:"英文不好的人，人生的選擇就會變少，懂嗎？",o:[["老師英文這麼好，最後還不是教國中。", 3, "……我這是選擇了 passion！跟你們講不通啦！"], ["很多有錢人英文都不好，老師亂講。", -2, "請舉一個名字。……舉不出來喔？咩哈～"], ["選擇變少，也不一定就不快樂啊。", 2, "對，你可以快樂地選擇不及格。"], ["那我……會好好學英文的，老師。", 1, "這句話你上學期也講過，一字不差。"]]}
+];
 const INTRO=[
 "Good morning, class～ 喔不對，是 good morning「大部分的」class。",
 "你。對，就是你啦親愛的。上次期中考 38 分那位～",
@@ -512,8 +542,8 @@ const INTRO=[
 ];
 const SILENCE=["怎麼不說話了～？Cat got your tongue？","Hello～？有人在嗎？還是你的腦袋還在 loading？","沉默是金，但你的沉默是廢鐵喔親愛的。","Speechless？咩～我就知道。"];
 const FINAL=["咩哈哈哈～沒話說了吧？That's what I thought～","Game over, sweetie～ 回去把 grammar 練好再來找我。","這就是 native-level 的實力。你，還差得遠呢～","下課～ 記得把今天的屈辱寫成英文作文，三百字喔。"];
-const GRADES={3:["神回！","✓",true],2:["普通","△",false],1:["太弱","✗",false],0:["自爆","✗",false],"-1":["沉默","…",false]};
-const MOODS={3:["破防",'cool','panic'],2:["冷笑",'','sneer'],1:["得意",'hot','smug'],0:["笑到流淚",'hot','laugh'],"-1":["囂張",'hot','smug']};
+const GRADES={"-2":["反被嘴","✗",false],3:["神回！","✓",true],2:["普通","△",false],1:["太弱","✗",false],0:["自爆","✗",false],"-1":["沉默","…",false]};
+const MOODS={"-2":["抓到你了",'hot','laugh'],3:["破防",'cool','panic'],2:["冷笑",'','sneer'],1:["得意",'hot','smug'],0:["笑到流淚",'hot','laugh'],"-1":["囂張",'hot','smug']};
 const RANKS=[[0,"當場陣亡"],[3,"勉強應戰"],[6,"頂嘴新秀"],[10,"教務處常客"],[15,"辯論社王牌"],[20,"Dylan 剋星"],[30,"英文科傳說"]];
 
 const $=id=>document.getElementById(id);
@@ -528,8 +558,10 @@ $('best').textContent=best;
 let autoT=null, introT=null, S, typer=null, skipType=false, timerRAF=null, timerStart=0, timerDur=0, phase='intro', introIdx=0;
 
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a}
-function newGame(){S={hp:100,round:0,wins:0,combo:0,maxCombo:0,deck:shuffle(ROUNDS.map((_,i)=>i)),survived:0}}
-function mult(){return 1+Math.floor(S.round/4)*.15}
+function newGame(){S={hp:100,round:0,wins:0,combo:0,maxCombo:0,easy:shuffle(ROUNDS.map((_,i)=>i)),hard:shuffle(HARD.map((_,i)=>i)),survived:0}}
+function pick(){const r=S.round,pH=r<=4?0:r>=10?1:(r-4)/6,h=Math.random()<pH,k=h?'hard':'easy',src=h?HARD:ROUNDS;if(!S[k].length)S[k]=shuffle(src.map((_,i)=>i));return src[S[k].pop()]}
+function tier(){return S.round<=4?'暖身':S.round<10?'認真':'地獄'}
+function mult(){return 1+Math.floor(S.round/3)*.15}
 function setHP(v){S.hp=Math.max(0,Math.min(100,Math.round(v)));$('hpFill').style.width=S.hp+'%';$('hpNum').textContent=S.hp;$('ruler').classList.toggle('low',S.hp<=30)}
 function show(id){['intro','play','over'].forEach(s=>$(s).hidden=s!==id);$('board').hidden=id==='play'}
 
@@ -562,11 +594,11 @@ introT=setTimeout(introStep,400);
 /* ---------- play ---------- */
 function startGame(){newGame();setHP(100);$('wins').textContent=0;show('play');phase='play';nextRound()}
 function nextRound(){
-  if(!S.deck.length)S.deck=shuffle(ROUNDS.map((_,i)=>i));
-  S.round++;S.cur=ROUNDS[S.deck.pop()];
+  S.round++;S.cur=pick();
+  $('tier').textContent=tier();$('tier').className='tier t'+tier();
   $('roundNo').textContent=S.round;
   // each line of trash talk wears you down
-  const drain=Math.round(3*mult());
+  const drain=Math.round(4*mult());
   if(S.round>1)setHP(S.hp-drain);
   if(S.hp<=0){return gameOver()}
   $('result').hidden=true;$('opts').innerHTML='';$('qlabel').style.visibility='hidden';
@@ -587,7 +619,7 @@ function showOptions(){
     if(o[1]===3)b.dataset.best='1';
     b.onclick=()=>choose(i);li.appendChild(b);$('opts').appendChild(li);
   });
-  timerDur=Math.max(4,9-(S.round-1)*.25)*1000;timerStart=performance.now();tick();
+  timerDur=Math.max(3.5,8-(S.round-1)*.3)*1000;timerStart=performance.now();tick();
 }
 function tick(){
   const p=1-(performance.now()-timerStart)/timerDur;
@@ -604,8 +636,8 @@ function choose(i){
   else{g=S.opts[i][1];reply=S.opts[i][2]}
   document.querySelectorAll('.opt').forEach((b,j)=>{b.disabled=true;if(j===i)b.classList.add('picked');else b.classList.add('faded');if(b.dataset.best&&g!==3)b.classList.add('best')});
   const m=mult();let d;
-  if(g===3){S.wins++;S.combo++;S.maxCombo=Math.max(S.maxCombo,S.combo);d=Math.max(2,10-Math.floor(S.round/5)*2)+(S.combo>=3?5:0)}
-  else{S.combo=0;d=-Math.round(({2:12,1:22,0:32,"-1":25})[g]*m)}
+  if(g===3){S.wins++;S.combo++;S.maxCombo=Math.max(S.maxCombo,S.combo);d=Math.max(1,8-Math.floor(S.round/4)*2)+(S.combo>=3?4:0)}
+  else{S.combo=0;d=-Math.round(({2:12,1:22,0:32,"-2":34,"-1":26})[g]*m)}
   setHP(S.hp+d);$('wins').textContent=S.wins;
   const [label,sym,ok]=GRADES[g];
   $('mark').textContent=sym;$('mark').className='mark'+(ok?' ok':'');
@@ -641,11 +673,14 @@ function gameOver(){
 $('againBtn').onclick=startGame;
 
 /* ---------- leaderboard ---------- */
-let LOCAL=false, DB=null, ME=null, myBest=null, myWins=0, myName='', last=null, boardRows=[];
+/* Cross-device board for the GitHub version: put the Firebase project ID here. Empty = per-device board. */
+const FIRESTORE_PROJECT='';
+let MODE=null, DB=null, ME=null, myBest=null, myWins=0, myName='', last=null, boardRows=[];
 try{myName=localStorage.getItem('dylan-name')||''}catch(e){}
 function boardMsg(t){$('boardMsg').textContent=t;$('boardMsg').hidden=!t}
-function renderBoard(snap){
-  boardRows=snap.docs.map(d=>{const v=d.data()||{};return{id:d.id,name:(typeof v.name==='string'&&v.name.trim()?v.name:'無名氏').slice(0,12),best:Math.max(0,Math.min(999,+v.best||0)),wins:Math.max(0,Math.min(999,+v.wins||0))}});
+function boardNote(t){$('board').querySelector('.hint').textContent=t}
+function renderBoard(rows){
+  boardRows=rows.map(v=>({id:v.id,name:(typeof v.name==='string'&&v.name.trim()?v.name:'無名氏').slice(0,12),best:Math.max(0,Math.min(999,+v.best||0)),wins:Math.max(0,Math.min(999,+v.wins||0))}));
   const ol=$('boardList');ol.innerHTML='';
   boardRows.forEach((r,i)=>{
     const li=document.createElement('li');if(r.id===ME)li.className='me';
@@ -655,69 +690,90 @@ function renderBoard(snap){
     const sc=li.querySelector('.sc');sc.textContent=r.best;const sm=document.createElement('small');sm.textContent='回合 · 神回 '+r.wins;sc.appendChild(sm);
     ol.appendChild(li);
   });
-  boardMsg(boardRows.length?'':'還沒有人上榜。第一個被 Dylan 嘴爆的就是你。');
+  boardMsg(boardRows.length?'':(MODE==='local'?'還沒有人上榜。這是這台裝置上的排行榜，借給同學玩也會記在這裡。':'還沒有人上榜。第一個被 Dylan 嘴爆的就是你。'));
+}
+/* claude.ai shared board */
+async function setupClaude(db,user){
+  MODE='claude';DB=db;ME=await user.id();
+  try{const mine=await db.doc('scores/'+ME).get();
+    if(mine.exists){const d=mine.data()||{};myBest=+d.best||0;myWins=+d.wins||0;if(!myName&&typeof d.name==='string')myName=d.name}}catch(e){}
+  $('nameInput').value=myName;
+  db.collection('scores').orderBy('best','desc').limit(10).onSnapshot(s=>renderBoard(s.docs.map(d=>Object.assign({id:d.id},d.data()||{}))),()=>boardMsg('排行榜暫時連不上，重新整理再試試。'));
+  if(last&&phase==='over')offerSubmit();
+}
+/* Firestore board (GitHub version) */
+const FS=()=>'https://firestore.googleapis.com/v1/projects/'+encodeURIComponent(FIRESTORE_PROJECT)+'/databases/(default)/documents';
+function playerId(){let id='';try{id=localStorage.getItem('dylan-pid')||''}catch(e){}
+  if(!/^[a-z0-9]{20}$/.test(id)){const c='abcdefghijklmnopqrstuvwxyz0123456789';id=Array.from(crypto.getRandomValues(new Uint8Array(20)),b=>c[b%36]).join('');try{localStorage.setItem('dylan-pid',id)}catch(e){}}
+  return id}
+function fsRow(doc){const f=doc.fields||{};return{id:doc.name.split('/').pop(),name:f.name&&f.name.stringValue,best:+(f.best&&f.best.integerValue)||0,wins:+(f.wins&&f.wins.integerValue)||0}}
+async function fsList(){
+  const r=await fetch(FS()+':runQuery',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({structuredQuery:{from:[{collectionId:'scores'}],orderBy:[{field:{fieldPath:'best'},direction:'DESCENDING'}],limit:10}})});
+  if(!r.ok)throw new Error('http '+r.status);
+  return (await r.json()).filter(x=>x.document).map(x=>fsRow(x.document));
+}
+async function fsRefresh(){try{renderBoard(await fsList())}catch(e){boardMsg('排行榜暫時連不上，等一下會自動再試。')}}
+async function fsWrite(name,best,wins){
+  const r=await fetch(FS()+'/scores/'+ME+'?updateMask.fieldPaths=name&updateMask.fieldPaths=best&updateMask.fieldPaths=wins',{method:'PATCH',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({fields:{name:{stringValue:name},best:{integerValue:String(best)},wins:{integerValue:String(wins)}}})});
+  if(!r.ok)throw new Error('http '+r.status);
+}
+async function setupOnline(){
+  MODE='online';ME=playerId();boardNote('所有玩家的前 10 名，每人只留最佳紀錄');
+  try{const r=await fetch(FS()+'/scores/'+ME);if(r.ok){const d=fsRow(await r.json());myBest=d.best;myWins=d.wins;if(!myName&&d.name)myName=d.name}}catch(e){}
+  $('nameInput').value=myName;
+  await fsRefresh();
+  setInterval(()=>{if(!document.hidden&&(phase==='intro'||phase==='over'))fsRefresh()},60000);
+  if(last&&phase==='over')offerSubmit();
+}
+/* per-device board */
+function loadLocal(){try{const a=JSON.parse(localStorage.getItem('dylan-board')||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}}
+function saveLocal(a){try{localStorage.setItem('dylan-board',JSON.stringify(a))}catch(e){}}
+function renderLocal(){renderBoard(loadLocal().sort((a,b)=>b.best-a.best||b.wins-a.wins).slice(0,10).map(r=>Object.assign({id:'n:'+r.name},r)))}
+function setupLocal(){
+  MODE='local';boardNote('這台裝置上的前 10 名，同一個暱稱只留最佳紀錄');
+  $('nameInput').value=myName;ME=myName?'n:'+myName:null;renderLocal();
+  if(last&&phase==='over')offerSubmit();
 }
 (async()=>{
   try{
-    if(!window.claude||!window.claude.use){return setupLocal()}
-    const [db,user]=await Promise.all([claude.use('db'),claude.use('user')]);
-    if(!db||!user){return setupLocal()}
-    DB=db;ME=await user.id();
-    try{const mine=await db.doc('scores/'+ME).get();
-      if(mine.exists){const d=mine.data()||{};myBest=+d.best||0;myWins=+d.wins||0;if(!myName&&typeof d.name==='string')myName=d.name}}catch(e){}
-    $('nameInput').value=myName;
-    db.collection('scores').orderBy('best','desc').limit(10).onSnapshot(renderBoard,()=>boardMsg('排行榜暫時連不上，重新整理再試試。'));
-    if(last&&phase==='over')offerSubmit();
-  }catch(e){setupLocal()}
+    if(window.claude&&window.claude.use){const [db,user]=await Promise.all([claude.use('db'),claude.use('user')]);if(db&&user)return await setupClaude(db,user)}
+  }catch(e){}
+  if(FIRESTORE_PROJECT)return setupOnline();
+  setupLocal();
 })();
-/* per-device leaderboard when the shared one isn't available (e.g. GitHub Pages) */
-function loadLocal(){try{const a=JSON.parse(localStorage.getItem('dylan-board')||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}}
-function saveLocal(a){try{localStorage.setItem('dylan-board',JSON.stringify(a))}catch(e){}}
-function renderLocal(){
-  const rows=loadLocal().sort((a,b)=>b.best-a.best||b.wins-a.wins).slice(0,10);
-  renderBoard({docs:rows.map(r=>({id:'n:'+r.name,data:()=>r}))});
-  if(!rows.length)boardMsg('還沒有人上榜。這是這台裝置上的排行榜，借給同學玩也會記在這裡。');
-}
-function setupLocal(){
-  if(LOCAL)return;LOCAL=true;
-  $('board').querySelector('.hint').textContent='這台裝置上的前 10 名，同一個暱稱只留最佳紀錄';
-  $('nameInput').value=myName;ME=myName?'n:'+myName:null;
-  renderLocal();
-  if(last&&phase==='over')offerSubmit();
-}
 function offerSubmit(){
-  if(!last||(!LOCAL&&(!DB||!ME)))return;
-  if(LOCAL){$('submitBox').hidden=false;$('submitBtn').disabled=false;$('submitBtn').textContent='上榜';$('submitMsg').textContent='輸入暱稱就能上榜（借給同學玩請換他的名字）。';return}
+  if(!last||!MODE)return;
   $('submitBox').hidden=false;$('submitBtn').disabled=false;$('submitBtn').textContent='上榜';
+  if(MODE==='local'){$('submitMsg').textContent='輸入暱稱就能上榜（借給同學玩請換他的名字）。';return}
   if(myBest!==null&&last.n<=myBest){$('submitMsg').textContent='你的最佳是 '+myBest+' 回合，這次沒超過。可以改暱稱再按一次。';$('submitBtn').textContent='更新暱稱';return}
   $('submitMsg').textContent=myBest===null?'輸入暱稱就能上榜。':'破你自己的紀錄了！';
   if(myName)submitScore();
 }
 async function submitScore(){
-  if(!last)return;
+  if(!last||!MODE)return;
   const name=($('nameInput').value.trim()||'無名氏').slice(0,12);
-  if(LOCAL){
+  if(MODE==='local'){
     if($('submitBtn').textContent==='已上榜')return;
     const a=loadLocal();const ex=a.find(r=>r.name===name);
     if(ex){if(last.n>ex.best){ex.best=last.n;ex.wins=last.wins}}else a.push({name,best:last.n,wins:last.wins});
     saveLocal(a);myName=name;ME='n:'+name;try{localStorage.setItem('dylan-name',name)}catch(e){}
     renderLocal();
-    const p=boardRows.findIndex(r=>r.id===ME);const b=(ex?ex.best:last.n);
+    const p=boardRows.findIndex(r=>r.id===ME),b=ex?ex.best:last.n;
     $('submitBtn').textContent='已上榜';$('submitBtn').disabled=true;
     $('submitMsg').textContent=name+' 的最佳是 '+b+' 回合'+(p>=0?'，目前第 '+(p+1)+' 名。':'，還沒擠進前 10。');
     return;
   }
-  if(!DB||!ME)return;
   const better=myBest===null||last.n>myBest;
   const best=better?last.n:myBest, wins=better?last.wins:myWins;
   $('submitBtn').disabled=true;$('submitMsg').textContent='上傳中……';
   try{
-    await DB.doc('scores/'+ME).set({name,best,wins,at:Date.now()});
+    if(MODE==='claude')await DB.doc('scores/'+ME).set({name,best,wins,at:Date.now()});
+    else{await fsWrite(name,best,wins);await fsRefresh()}
     myBest=best;myWins=wins;myName=name;try{localStorage.setItem('dylan-name',name)}catch(e){}
-    const pos=boardRows.findIndex(r=>r.id===ME);
-    $('submitMsg').textContent='已上榜：'+name+'，最佳 '+best+' 回合。';
     $('submitBtn').textContent='已上榜';
-    setTimeout(()=>{const p=boardRows.findIndex(r=>r.id===ME);$('submitMsg').textContent='已上榜：'+name+'，最佳 '+best+' 回合'+(p>=0?'，目前第 '+(p+1)+' 名。':'，還沒擠進前 10。')},900);
+    const show=()=>{const p=boardRows.findIndex(r=>r.id===ME);$('submitMsg').textContent='已上榜：'+name+'，最佳 '+best+' 回合'+(p>=0?'，目前第 '+(p+1)+' 名。':'，還沒擠進前 10。')};
+    if(MODE==='claude')setTimeout(show,900);else show();
   }catch(e){$('submitBtn').disabled=false;$('submitMsg').textContent=e&&e.code==='not_granted'?'你只有檢視權限，沒辦法上榜。請分享者給你可互動的權限。':'上傳失敗，再按一次試試。'}
 }
 $('submitBtn').onclick=submitScore;

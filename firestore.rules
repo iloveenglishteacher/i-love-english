@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /scores/{player} {
+      allow read: if true;
+      allow create, update: if player.matches('^[a-z0-9]{20}$')
+        && request.resource.data.keys().hasOnly(['name', 'best', 'wins'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 12
+        && request.resource.data.best is int
+        && request.resource.data.best >= 0
+        && request.resource.data.best <= 60
+        && request.resource.data.wins is int
+        && request.resource.data.wins >= 0
+        && request.resource.data.wins <= request.resource.data.best
+        && (resource == null || request.resource.data.best >= resource.data.best);
+      allow delete: if false;
+    }
+  }
+}
