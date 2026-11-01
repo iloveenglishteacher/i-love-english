@@ -674,7 +674,7 @@ $('againBtn').onclick=startGame;
 
 /* ---------- leaderboard ---------- */
 /* Cross-device board for the GitHub version: put the Firebase project ID here. Empty = per-device board. */
-const FIRESTORE_PROJECT='';
+const FIRESTORE_PROJECT='i-love-english-2f099';
 let MODE=null, DB=null, ME=null, myBest=null, myWins=0, myName='', last=null, boardRows=[];
 try{myName=localStorage.getItem('dylan-name')||''}catch(e){}
 function boardMsg(t){$('boardMsg').textContent=t;$('boardMsg').hidden=!t}
