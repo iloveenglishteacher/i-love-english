@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="跟毒舌的 Dylan 山羊老師吵架，用選擇題回嘴，底氣歸零就輸，看你能撐幾回合。">
+<title>不服來辯</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Serif+TC:wght@500;700;900&display=swap">
+<style>
+html{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+body{margin:0;font-size:14px}
+img{max-width:100%}
+
+/* Layout: one exam sheet on a desk mat; the teacher writes in red pen, you answer like a multiple-choice test. Single committed light look. */
+:root{
+  color-scheme: light;
+  --wall:#dfe2d6;
+  --paper:#f4f6f3;
+  --rule:#c8d5e2;
+  --margin:#e6a3a0;
+  --ink:#1e2330;
+  --pencil:#5b6270;
+  --red:#cc2e2a;
+  --red-soft:#f6dcda;
+  --good:#1f7a4d;
+  --f-print:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --f-pen:"LXGW WenKai TC","Kaiti TC","BiauKai","DFKai-SB",serif;
+  --mx:52px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{background:var(--wall);color:var(--ink);font-family:var(--f-print);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:clamp(56px,13vh,150px) 40px}
+.room{position:fixed;inset:0;z-index:-1;pointer-events:none}
+.room svg{width:100%;height:100%;display:block}
+.paper{z-index:0}
+.paper{max-width:700px;margin:0 auto;background:var(--paper);
+  box-shadow:0 1px 0 #b9c3bf,0 18px 40px -18px rgba(30,40,50,.35);
+  padding:28px 28px 32px;border-radius:6px;position:relative;min-height:520px}
+@media (max-width:520px){.paper{padding:20px 16px 24px}}
+
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:10px}
+.goat{display:block;width:64px;height:auto;margin-bottom:2px}
+h1{margin:2px 0 0;font-weight:900;font-size:28px;letter-spacing:.06em;text-wrap:balance}
+.meta{font-size:13px;color:var(--pencil);display:flex;gap:14px;font-variant-numeric:tabular-nums}
+.meta b{color:var(--ink);font-size:16px}
+
+.gauge{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;margin:16px 0 4px;font-size:13px}
+.gauge span{font-variant-numeric:tabular-nums;min-width:3ch;text-align:right;font-weight:700}
+.ruler{height:16px;border:1.5px solid var(--ink);position:relative;overflow:hidden;background:
+  repeating-linear-gradient(to right,var(--ink) 0 1px,transparent 1px 10%)}
+.ruler i{position:absolute;inset:0 auto 0 0;width:100%;background:#f2c94c;transition:width .45s ease,background .3s;mix-blend-mode:multiply}
+.ruler.low i{background:var(--red)}
+.gauge-note{font-size:11px;color:var(--pencil);margin:0 0 10px}
+
+/* intro */
+.intro-lines{min-height:250px;display:flex;flex-direction:column;gap:6px;margin-top:18px}
+.pen{font-family:var(--f-pen);color:var(--red);font-size:20px;line-height:34px;margin:0}
+.who{font-size:13px;color:var(--pencil);margin:18px 0 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.mood{font-size:12px;border:1px solid var(--pencil);padding:1px 8px;border-radius:99px;color:var(--pencil);background:var(--paper)}
+.mood.hot{border-color:var(--red);color:var(--red)}
+.mood.cool{border-color:var(--good);color:var(--good)}
+.stampwrap{display:flex;justify-content:center;margin:14px 0 6px;min-height:150px;align-items:center}
+.stamp{font-family:var(--f-pen);font-weight:700;color:var(--red);border:5px solid var(--red);border-radius:6px;
+  display:grid;grid-template-columns:1fr 1fr;width:132px;height:132px;place-items:center;font-size:46px;line-height:1;
+  transform:rotate(-8deg);box-shadow:inset 0 0 0 3px var(--paper),inset 0 0 0 5px var(--red);opacity:.92;
+  animation:stamp .38s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes stamp{from{transform:rotate(-8deg) scale(2.4);opacity:0}to{transform:rotate(-8deg) scale(1);opacity:.92}}
+
+.btn{font-family:var(--f-print);font-weight:700;font-size:16px;background:var(--ink);color:var(--paper);border:0;padding:12px 22px;border-radius:3px;cursor:pointer;letter-spacing:.06em}
+.btn:hover{background:#000}
+.btn.ghost{background:transparent;color:var(--pencil);border:1px dashed var(--pencil);font-weight:500;font-size:14px;padding:8px 14px}
+.btn:focus-visible,.opt:focus-visible{outline:3px solid #f2c94c;outline-offset:2px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.hint{font-size:12px;color:var(--pencil)}
+
+/* play */
+.say-box{margin-top:6px;cursor:pointer}
+.say{min-height:68px}
+.timer{height:4px;background:var(--rule);margin:8px 0 18px;overflow:hidden}
+.timer i{display:block;height:100%;width:100%;background:var(--ink);transform-origin:left}
+.timer.urgent i{background:var(--red)}
+.qlabel{font-size:13px;color:var(--pencil);margin:0 0 6px;letter-spacing:.08em}
+.opts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.opt{width:100%;text-align:left;display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start;background:transparent;border:0;
+  font-family:var(--f-print);font-size:16px;line-height:1.6;color:var(--ink);padding:6px 6px 6px 0;cursor:pointer;border-radius:3px}
+.opt:hover:not(:disabled){background:rgba(242,201,76,.22)}
+.bubble{width:26px;height:26px;border:1.5px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:1px}
+.opt.picked .bubble{background:var(--ink);color:var(--paper);box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--pencil)}
+.opt:disabled{cursor:default}
+.opt.faded{opacity:.35}
+.opt.best:not(.picked) .txt{text-decoration:underline wavy var(--good);text-underline-offset:5px}
+
+.result{margin-top:16px;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center}
+.mark{font-family:var(--f-pen);font-weight:700;font-size:54px;line-height:1;color:var(--red);transform:rotate(-6deg);animation:stamp .3s cubic-bezier(.2,1.6,.4,1) both;grid-row:span 2}
+.mark.ok{color:var(--good)}
+.grade{font-family:var(--f-pen);font-size:22px;font-weight:700;color:var(--red)}
+.grade.ok{color:var(--good)}
+.delta{font-size:13px;color:var(--pencil);font-variant-numeric:tabular-nums}
+.reply{grid-column:1/-1;margin-top:8px}
+.result .row{grid-column:1/-1;margin-top:10px}
+.combo{font-family:var(--f-pen);color:var(--good);font-size:18px}
+
+/* sheep avatar */
+.with-av{display:grid;grid-template-columns:104px 1fr;gap:16px;align-items:start;margin-top:14px}
+.with-av>div{min-width:0}
+.avatar svg{width:100%;height:auto;display:block;overflow:visible}
+.avatar.talking svg{animation:bob .45s ease-in-out infinite alternate}
+@keyframes bob{from{transform:translateY(0) rotate(-1deg)}to{transform:translateY(-3px) rotate(1.5deg)}}
+.sheep .f,.sheep .mic{display:none}
+.sheep.m-smug .smug,.sheep.m-sneer .sneer,.sheep.m-panic .panic,.sheep.m-laugh .laugh,.sheep.m-talk .talk,.sheep.m-talk .mic{display:inline}
+.with-av .who{margin-top:0}
+.with-av .intro-lines{margin-top:8px}
+@media (max-width:520px){.with-av{grid-template-columns:76px 1fr;gap:10px}}
+
+/* over */
+.over-top{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;margin-top:22px}
+.score{width:128px;height:128px;border:4px solid var(--red);border-radius:50%;display:grid;place-items:center;text-align:center;color:var(--red);font-family:var(--f-pen);transform:rotate(-7deg);animation:stamp .4s cubic-bezier(.2,1.6,.4,1) both}
+.score b{display:block;font-size:52px;line-height:1}
+.score small{font-size:13px}
+.rank{font-weight:900;font-size:26px;margin:0}
+.stats{margin:6px 0 0;font-size:14px;color:var(--pencil);line-height:1.8;font-variant-numeric:tabular-nums}
+.stats b{color:var(--ink)}
+.new{color:var(--red);font-family:var(--f-pen);font-weight:700}
+.board{margin-top:26px;border-top:2px solid var(--ink);padding-top:14px}
+.board h2{margin:0;font-size:20px;font-weight:900;letter-spacing:.06em}
+.board ol{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column}
+.board li{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:7px 4px;border-bottom:1px dashed var(--rule);font-variant-numeric:tabular-nums}
+.board li.me{background:rgba(242,201,76,.25)}
+.board .rk{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;color:var(--pencil);border:1px solid var(--rule)}
+.board li:nth-child(-n+3) .rk{border:2px solid var(--red);color:var(--red);font-family:var(--f-pen);font-size:15px}
+.board .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+.board .nm small{font-weight:500;color:var(--pencil);margin-left:6px}
+.board .sc{font-family:var(--f-pen);font-size:18px;color:var(--red)}
+.board .sc small{font-family:var(--f-print);font-size:12px;color:var(--pencil);margin-left:2px}
+.submit{margin-top:20px;display:flex;flex-direction:column;gap:6px}
+.submit label{font-size:13px;color:var(--pencil)}
+.submit input{font-family:var(--f-print);font-size:16px;padding:10px 12px;border:1.5px solid var(--ink);border-radius:3px;background:#fff;color:var(--ink);min-width:0;flex:1 1 160px}
+.submit input:focus-visible{outline:3px solid #f2c94c;outline-offset:1px}
+.shake{animation:shake .35s}
+@keyframes shake{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:520px){.pen{font-size:18px;line-height:30px}.opt{font-size:15px}.over-top{grid-template-columns:1fr;justify-items:start}}
+</style>
+</head>
+<body>
+<main>
+<div class="room" aria-hidden="true">
+<svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMin slice">
+  <rect width="1600" height="1000" fill="#dfe2d6"/>
+  <rect y="660" width="1600" height="170" fill="#cbd4c3"/>
+  <rect y="656" width="1600" height="8" fill="#a8b49f"/>
+  <!-- clock -->
+  <circle cx="1530" cy="70" r="34" fill="#fbfbf7" stroke="#3b3f45" stroke-width="5"/>
+  <path d="M1530 70 L1530 48 M1530 70 L1546 78" stroke="#3b3f45" stroke-width="4" stroke-linecap="round"/>
+  <!-- chalkboard -->
+  <rect x="90" y="40" width="1380" height="500" rx="6" fill="#8a5b36"/>
+  <rect x="106" y="56" width="1348" height="468" fill="#2e4b3c"/>
+  <rect x="106" y="56" width="1348" height="468" fill="url(#smudge)"/>
+  <rect x="80" y="536" width="1400" height="14" rx="3" fill="#7a4f2e"/>
+  <rect x="300" y="528" width="34" height="8" rx="3" fill="#f7f4ea"/><rect x="350" y="529" width="24" height="7" rx="3" fill="#f2c9c4"/><rect x="1180" y="528" width="40" height="9" rx="2" fill="#3c3c44"/>
+  <defs><radialGradient id="smudge" cx=".3" cy=".4" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".07"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+  <g font-family="LXGW WenKai TC, Kaiti TC, BiauKai, serif" fill="#eef0e6" opacity=".9">
+    <text x="140" y="120" font-size="34">10/25（日）</text>
+    <text x="140" y="168" font-size="28">值日生：你</text>
+    <text x="140" y="250" font-size="30">I am agree</text>
+    <path d="M136 262 L300 228 M136 228 L300 262" stroke="#f2a6a0" stroke-width="5" stroke-linecap="round"/>
+    <text x="140" y="330" font-size="30">I agree ✓</text>
+    <text x="140" y="420" font-size="26" fill="#f6e08a">考試範圍：</text>
+    <text x="140" y="460" font-size="26" fill="#f6e08a">Unit 3～5</text>
+    <text x="1180" y="120" font-size="30">Today：</text>
+    <text x="1180" y="166" font-size="30">過去式！！</text>
+    <path d="M1180 180 Q1260 192 1340 178" stroke="#eef0e6" stroke-width="3" fill="none"/>
+    <text x="1180" y="250" font-size="26">go → went</text>
+    <text x="1180" y="292" font-size="26">eat → ate</text>
+    <text x="1180" y="334" font-size="26">argue → argued</text>
+    <text x="1200" y="440" font-size="40" fill="#f2a6a0">咩～</text>
+  </g>
+  <!-- floor -->
+  <rect y="830" width="1600" height="170" fill="#b58a5e"/>
+  <g stroke="#9f764d" stroke-width="3"><path d="M0 870 H1600 M0 920 H1600 M0 970 H1600"/></g>
+  <!-- desks -->
+  <g fill="#c9a074" stroke="#8f6a45" stroke-width="3">
+    <rect x="40" y="760" width="230" height="26" rx="4"/><rect x="1330" y="760" width="230" height="26" rx="4"/>
+    <rect x="-60" y="880" width="260" height="30" rx="4"/><rect x="1400" y="880" width="260" height="30" rx="4"/>
+  </g>
+  <g fill="#6f7d8a"><rect x="60" y="786" width="10" height="70"/><rect x="240" y="786" width="10" height="70"/><rect x="1350" y="786" width="10" height="70"/><rect x="1530" y="786" width="10" height="70"/></g>
+</svg>
+</div>
+<article class="paper" id="paper">
+  <header class="head">
+    <div>
+      <svg class="goat" viewBox="0 0 96 56" aria-hidden="true">
+        <g stroke="#25212b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M70 10 Q76 0 84 4" fill="none" stroke-width="3"/><path d="M66 12 Q70 2 78 4" fill="none" stroke-width="3"/>
+          <path d="M14 22 C14 14 24 12 34 13 L58 13 C66 13 70 18 70 26 L68 34 C64 38 20 38 16 34 C14 30 14 26 14 22Z" fill="#fbfbf7"/>
+          <path d="M14 22 L6 18" fill="none"/>
+          <path d="M62 16 L68 8 C76 8 84 12 86 20 C87 24 84 28 80 28 C76 28 72 26 68 24Z" fill="#fbfbf7"/>
+          <path d="M80 28 L79 36 L76 30" fill="#fbfbf7"/>
+          <path d="M66 14 L58 10 L64 18Z" fill="#e2bf9c"/>
+          <path d="M22 36 L21 50 M30 37 L30 50 M54 37 L55 50 M62 36 L63 50" fill="none" stroke-width="2.6"/>
+        </g>
+        <circle cx="76" cy="16" r="1.8" fill="#25212b"/>
+      </svg>
+      <h1>不服來辯</h1>
+    </div>
+    <div class="meta">
+      <span>第 <b id="roundNo">0</b> 回合</span>
+      <span>嗆贏 <b id="wins">0</b></span>
+      <span>紀錄 <b id="best">0</b></span>
+    </div>
+  </header>
+
+  <div class="gauge" aria-label="底氣">
+    <span style="font-weight:500;min-width:auto;text-align:left">底氣</span>
+    <div class="ruler" id="ruler"><i id="hpFill"></i></div>
+    <span id="hpNum">100</span>
+  </div>
+  <p class="gauge-note">底氣歸零 = 被嘴到無話可說。每一回合老師的嘴砲都會消耗你的底氣，越後面越兇。</p>
+
+  <!-- INTRO -->
+  <section id="intro">
+    <div class="with-av">
+      <div class="avatar" id="avIntro"></div>
+      <div>
+        <p class="who">Dylan 羊老師（英文科・自稱留美）<span class="mood" id="moodIntro">準備開嘴</span></p>
+        <div class="intro-lines" id="introLines"></div>
+      </div>
+    </div>
+    <div class="stampwrap" id="stampWrap" hidden><div class="stamp" aria-label="不服來辯"><span>不</span><span>服</span><span>來</span><span>辯</span></div></div>
+    <div class="row">
+      <button class="btn" id="introBtn">跳過開場</button>
+      <span class="hint" id="introHint">按 Enter 也可以</span>
+    </div>
+  </section>
+
+  <!-- PLAY -->
+  <section id="play" hidden>
+    <div class="with-av">
+      <div class="avatar" id="avPlay"></div>
+      <div>
+        <p class="who">Dylan 羊老師 <span class="mood" id="mood">得意</span></p>
+        <div class="say-box" id="sayBox" title="點一下跳過打字">
+          <p class="pen say" id="say"></p>
+        </div>
+      </div>
+    </div>
+    <div class="timer" id="timer"><i id="timerFill"></i></div>
+    <p class="qlabel" id="qlabel">請選出最能讓老師閉嘴的回答：</p>
+    <ol class="opts" id="opts"></ol>
+    <div class="result" id="result" hidden>
+      <div class="mark" id="mark">✓</div>
+      <div class="grade" id="grade"></div>
+      <div class="delta" id="delta"></div>
+      <p class="pen reply" id="reply"></p>
+      <div class="row">
+        <button class="btn" id="nextBtn">下一回合 →</button>
+        <span class="combo" id="combo"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- OVER -->
+  <section id="over" hidden>
+    <div class="with-av">
+      <div class="avatar" id="avOver"></div>
+      <div>
+        <p class="who">Dylan 羊老師 <span class="mood hot">笑到咩咩叫</span></p>
+        <p class="pen" id="finalLine"></p>
+      </div>
+    </div>
+    <div class="over-top">
+      <div class="score"><div><b id="finalScore">0</b><small>回合</small></div></div>
+      <div>
+        <p class="hint" style="margin:0">你被嘴到無話可說。總評：</p>
+        <p class="rank" id="rank"></p>
+        <p class="stats" id="stats"></p>
+      </div>
+    </div>
+    <div class="submit" id="submitBox" hidden>
+      <label for="nameInput">留下大名上排行榜</label>
+      <div class="row"><input id="nameInput" maxlength="12" placeholder="你的暱稱（最多 12 字）" autocomplete="nickname"><button class="btn" id="submitBtn">上榜</button></div>
+      <p class="hint" id="submitMsg" style="margin:0"></p>
+    </div>
+    <div class="row" style="margin-top:22px">
+      <button class="btn" id="againBtn">不服，再辯一次</button>
+    </div>
+  </section>
+
+  <section class="board" id="board">
+    <h2>頂嘴排行榜</h2>
+    <p class="hint" style="margin:2px 0 0">撐過最多回合的前 10 名，每人只留最佳紀錄</p>
+    <ol id="boardList"></ol>
+    <p class="hint" id="boardMsg">排行榜讀取中……</p>
+  </section>
+</article>
+</main>
+
+<template id="sheepTpl">
+<svg class="sheep m-smug" viewBox="0 0 120 132" aria-hidden="true">
+  <!-- maroon tee -->
+  <path d="M12 132 C14 108 34 99 60 99 C86 99 106 108 108 132Z" fill="#8f2633"/>
+  <path d="M47 100 Q60 109 73 100" fill="none" stroke="#6b1b26" stroke-width="2.2"/>
+  <g fill="#f08a3c"><rect x="68" y="114" width="5" height="6" rx="1"/><rect x="74.5" y="114" width="5" height="6" rx="1"/><rect x="81" y="112" width="3" height="8" rx="1"/><rect x="85" y="114" width="4" height="6" rx="1"/></g>
+  <!-- curved goat horns -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M49 36 C45 20 35 10 22 12 C16 13 14 18 17 22" stroke="#b39e7f" stroke-width="7"/>
+    <path d="M71 36 C75 20 85 10 98 12 C104 13 106 18 103 22" stroke="#b39e7f" stroke-width="7"/>
+    <g stroke="#8f7b5e" stroke-width="1.4"><path d="M42 24 l5 -3"/><path d="M36 17 l4 -4"/><path d="M28 13 l2 -5"/><path d="M78 24 l-5 -3"/><path d="M84 17 l-4 -4"/><path d="M92 13 l-2 -5"/></g>
+  </g>
+  <!-- floppy sideways ears -->
+  <ellipse cx="22" cy="58" rx="15" ry="6" transform="rotate(18 22 58)" fill="#e6e0d4" stroke="#c9c2b4" stroke-width="1.2"/>
+  <ellipse cx="23" cy="58" rx="10" ry="2.8" transform="rotate(18 23 58)" fill="#f2a9a6"/>
+  <ellipse cx="98" cy="58" rx="15" ry="6" transform="rotate(-18 98 58)" fill="#e6e0d4" stroke="#c9c2b4" stroke-width="1.2"/>
+  <ellipse cx="97" cy="58" rx="10" ry="2.8" transform="rotate(-18 97 58)" fill="#f2a9a6"/>
+  <!-- goatee -->
+  <path d="M53 95 Q57 118 60 121 Q63 118 67 95Z" fill="#d6cfc1" stroke="#b8b0a1" stroke-width="1.2"/>
+  <!-- long goat face -->
+  <path d="M60 31 C77 31 84 45 83 61 C82 79 74 98 60 100 C46 98 38 79 37 61 C36 45 43 31 60 31Z" fill="#efeae1" stroke="#c9c2b4" stroke-width="1.4"/>
+  <!-- fine spiky fringe -->
+  <path d="M43 43 L44.5 30 L47 41 L49.5 26 L52 40 L54.5 23 L57 39 L59.5 21 L62 39 L64.5 22 L67 39 L69.5 25 L72 40 L74.5 28 L77 43 Q60 38 43 43Z" fill="#25212b"/>
+  <!-- muzzle + Y nose -->
+  <ellipse cx="60" cy="86" rx="15" ry="12" fill="#f8f5ef"/>
+  <path d="M56.5 80 L60 83.5 L63.5 80 M60 83.5 L60 86.5" stroke="#5a3b2e" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <g stroke="#25212b" stroke-width="2.4" stroke-linecap="round" fill="none">
+    <!-- smug -->
+    <g class="f smug">
+      <path d="M42 51 L54 52"/><path d="M66 48 Q72 43 79 47"/>
+      <path d="M45 61 A4 4 0 0 0 53 61Z" fill="#25212b"/><path d="M44 61 L54 61"/>
+      <path d="M67 61 A4 4 0 0 0 75 61Z" fill="#25212b"/><path d="M66 61 L76 61"/>
+      <path d="M53 89 Q61 92 68 85"/>
+    </g>
+    <!-- sneer -->
+    <g class="f sneer">
+      <path d="M42 49 L54 54"/><path d="M66 54 L78 49"/>
+      <path d="M45 61 L53 61"/><path d="M67 61 L75 61"/>
+      <path d="M52 89 L65 88 L69 85"/>
+    </g>
+    <!-- panic -->
+    <g class="f panic">
+      <path d="M43 52 L53 47"/><path d="M67 47 L77 52"/>
+      <circle cx="49" cy="61" r="5" fill="#fff"/><circle cx="71" cy="61" r="5" fill="#fff"/>
+      <circle cx="49" cy="61" r="1.6" fill="#25212b"/><circle cx="71" cy="61" r="1.6" fill="#25212b"/>
+      <path d="M51 89 q2.5 -3 5 0 t5 0 t5 0"/>
+      <ellipse cx="43" cy="73" rx="4.5" ry="2.6" fill="#f3a3a0" stroke="none"/><ellipse cx="77" cy="73" rx="4.5" ry="2.6" fill="#f3a3a0" stroke="none"/>
+      <path d="M88 38 q4 6 0 9 q-4 -3 0 -9Z" fill="#8ec7ea" stroke="none"/>
+    </g>
+    <!-- laugh -->
+    <g class="f laugh">
+      <path d="M43 49 Q48 45 54 48"/><path d="M66 48 Q72 45 77 49"/>
+      <path d="M45 63 Q49 56 53 63"/><path d="M67 63 Q71 56 75 63"/>
+      <path d="M50 85 Q60 101 71 85Z" fill="#6b2430"/>
+      <ellipse cx="63" cy="93" rx="4.5" ry="3" fill="#ef8f93" stroke="none"/>
+      <path d="M42 66 q-2 4 0 6" stroke="#8ec7ea"/><path d="M78 66 q2 4 0 6" stroke="#8ec7ea"/>
+    </g>
+    <!-- talk -->
+    <g class="f talk">
+      <path d="M43 51 L54 50"/><path d="M66 50 L77 51"/>
+      <circle cx="49" cy="61" r="3" fill="#25212b"/><circle cx="71" cy="61" r="3" fill="#25212b"/>
+      <ellipse cx="60" cy="88" rx="4" ry="3" fill="#6b2430"/>
+    </g>
+  </g>
+  <!-- yellow mic (intro) -->
+  <g class="mic">
+    <rect x="44" y="92" width="6" height="26" rx="2" transform="rotate(14 47 92)" fill="#2b2b2b"/>
+    <circle cx="51" cy="88" r="8" fill="#f2d33b" stroke="#c9a91c" stroke-width="1.2"/>
+  </g>
+  <!-- coffee -->
+  <g transform="translate(88 98)">
+    <path d="M2 4 L18 4 L16 32 L4 32Z" fill="#fff" stroke="#b9bdb6" stroke-width="1.2"/>
+    <rect x="0" y="0" width="20" height="5" rx="1.5" fill="#f4f4f1" stroke="#b9bdb6" stroke-width="1.2"/>
+    <path d="M3 14 L17 14 L16.3 24 L3.7 24Z" fill="#8a6a4f"/>
+    <circle cx="10" cy="19" r="3" fill="#f4f4f1"/>
+    <ellipse cx="1" cy="22" rx="5" ry="6.5" fill="#3a3034"/><path d="M-1 17 L-1 27" stroke="#5b4d52" stroke-width="1.2"/>
+  </g>
+</svg>
+</template>
+
+<script>
+(function(){
+// grade: 3 神回, 2 普通, 1 太弱, 0 自爆
+const ROUNDS=[
+{t:"你上次作文寫「I very like it」，我改到眼睛都快瞎了。Do you even read, sweetie？",o:[
+["老師黑板寫 Wendsday 掛了一整節耶。",3,"那、那是 typo！Typo 跟你那種 fundamental 的錯誤不是同一個 level 好嗎……"],
+["至少我有寫完，總比交白卷好吧。",2,"寫完？垃圾寫完還是垃圾。Quantity is not quality, OK？"],
+["我……我下次會注意啦，對不起。",1,"下次？你每次都說下次。你的「下次」跟火車誤點一樣，從來沒準過。"],
+["I very sorry, I very careful.",0,"……Oh my God。你是故意的嗎？我要 call your parents。"]]},
+{t:"你的發音很 Taiwanese 你知道嗎？聽你念課文，我耳朵都過敏了。",o:[
+["老師 comfortable 念錯三年，大家在忍。",3,"That's…… 那是 British accent 的一種 variation！你懂什麼 linguistics？"],
+["有口音又不影響溝通，聽得懂就好。",2,"不影響？你去機場講講看，海關直接把你遣返。"],
+["我有在練啦……每天都有念一點點。",1,"練？練什麼？練怎麼讓我頭痛嗎？"],
+["Sank you teacher, sank you very much.",0,"Sank you？我只想把你的成績 sink 到海底。"]]},
+{t:"我在美國的時候啊，同學都說我的英文比 native speaker 還 native。",o:[
+["老師說的美國，是那個三個月遊學團嗎？",3,"三、三個月也是美國啊！Time doesn't matter, experience matters！……你翻我 IG 幹嘛？"],
+["老師這麼厲害，為什麼回來教國中？",2,"因為我有 passion。像你這種沒 passion 的人不會懂。"],
+["哇……好厲害喔，老師好像很會講。",1,"Of course。不像某些人，連 native 怎麼拼都要查。"],
+["我也好想去美國喔，老師帶我去嘛。",0,"以你的英文，你只能去美國的機場，然後被退回來。"]]},
+{t:"上課不要問笨問題。你每問一題，全班平均智商就掉一點。",o:[
+["老師答不出 who 跟 whom，全班掉幾點？",3,"那是在培養你們 self-learning 的能力！This is pedagogy！"],
+["不問的話怎麼會懂？問問題是在學習耶。",2,"Smart people 不用問就懂。你看，這就是差別。"],
+["好……那我以後都不問了，對不起。",1,"Good。這是你今天講過最聰明的一句話。"],
+["那老師可以先解釋一下什麼是智商嗎？",0,"……你剛剛又讓全班掉了一點。"]]},
+{t:"考卷才 38 分還敢跟我頂嘴？Who gave you the confidence？",o:[
+["第 12 題有兩個答案，要我去教務處嗎？",3,"……那、那是 trick question！是在測驗你們的 critical thinking！"],
+["38 分也比 0 分強吧，我有在進步啊。",2,"Wow，好棒喔，要不要我幫你辦慶功宴？"],
+["我……那次是粗心啦，不是真的不會。",1,"粗心？我看你是整顆心都不見了。"],
+["是你教得太爛吧……吧？應該是吧？",0,"「吧」？你自己都不確定？Come on，嗆人也要有點骨氣。"]]},
+{t:"你英文名字叫 Lucky？我看你考試完全沒有 luck 啊。",o:[
+["老師的 Dylan 是補習班櫃台幫你取的吧？",3,"蛤～？誰跟你說的？！Dylan 是很 classy 的名字好嗎親愛的！"],
+["名字跟成績到底有什麼關係啊老師？",2,"有啊，名不副實，這叫 irony。啊你應該不知道 irony 是什麼。"],
+["那我可以換一個英文名字嗎……拜託。",1,"換成 Unlucky 比較貼切。"],
+["Lucky is my dog name, very cute.",0,"……Your dog's name。所有格。你連狗都對不起。"]]},
+{t:"Grammar 是英文的靈魂。你沒有 grammar，你就是一個沒有靈魂的人。",o:[
+["老師這句翻成英文也沒 grammar 喔。",3,"我、我在講中文！中文不用 grammar！……等等，中文也有……Whatever！"],
+["能溝通比文法重要吧，外國人聽得懂啊。",2,"這是學不好的人最愛的藉口，classic。"],
+["我的靈魂還在啦……只是比較小一點。",1,"在哪？在你上課睡覺的夢裡嗎？"],
+["Grammar is very difficulty for me.",0,"Difficult。形容詞。你看，你連抱怨都抱怨錯。"]]},
+{t:"你看看隔壁班的 Amy，人家多優秀，你怎麼不學學人家？",o:[
+["Amy 都在補習，補習班老師你天天罵耶。",3,"……那是 coincidence！而且基礎是我打的！Foundation, OK？"],
+["每個人都不一樣啊，幹嘛一直比較。",2,"對，有些人很優秀，有些人是你。"],
+["Amy 真的很厲害……我比不上她啦。",1,"看吧，連你都承認。So sad。"],
+["Amy 是誰啊？我好像沒聽過這個人。",0,"你連同學都不認識？你的人生跟你的考卷一樣，一片空白。"]]},
+{t:"我講話中英夾雜，是因為我的腦袋已經 think in English 了，你們不懂啦。",o:[
+["那老師想「便當」英文時，為何卡五秒？",3,"那、那是在 select 最 accurate 的 vocabulary！你不懂 bilingual 的痛！"],
+["那老師乾脆全英文上課啊，我們可以。",2,"全英文？你們聽得懂嗎？我是在 accommodate 你們好嗎。"],
+["喔……聽起來好像真的很厲害耶。",1,"不是好像，是 definitely。"],
+["我也會 think in English！例如 apple？",0,"Apple。很好，你的程度跟幼稚園字卡一樣。"]]},
+{t:"作業遲交一天扣十分。我是在教你們 responsibility。",o:[
+["老師考卷拖兩週才發，要扣老師幾分？",3,"老師很忙！我要 prepare lessons、attend meetings，你懂 teacher 的 workload 嗎？"],
+["我那天生病了啊，有請假單可以證明。",2,"生病也可以寫作業。我當年發燒都在寫 report。"],
+["對不起，我下次一定會準時交……",1,"你的「下次」已經比我的薪水還不值錢了。"],
+["我家的狗把作業吃掉了，真的啦。",0,"這藉口老到我在美國的時候就聽過了。Next。"]]},
+{t:"你知道 ambitious 是什麼意思嗎？不知道吧，因為你沒有。",o:[
+["知道啊，就是老師當年想當口譯的心情。",3,"我……我是 choose 了 education！這是 calling！你這小孩怎麼這麼 mean？"],
+["有野心的人應該不會整天嘴學生吧。",2,"這不叫嘴，這叫 tough love。Look it up。"],
+["我……我有一點點啦，真的一點點。",1,"一點點的野心配一點點的腦袋，very balanced。"],
+["是那個……嗚咿嗚咿的救護車嗎？",0,"那是 ambulance。我真的要叫救護車了，我心臟受不了。"]]},
+{t:"你不要以為頂嘴很帥。在美國，這叫 disrespectful。",o:[
+["在美國當眾笑學生分數，學校要開會的。",3,"我、我這是 constructive feedback！而且這裡又不是美國！"],
+["我只是在表達意見，老師不用激動。",2,"Your opinion 就像你的考卷，沒人想看。"],
+["我沒有要裝帥啦……真的沒有。",1,"Don't worry，沒有人覺得你帥，尤其是你的成績單。"],
+["Disre……disrespect 後面是什麼？",0,"Disrespectful。連被罵的單字都聽不懂，好可憐喔。"]]},
+{t:"你的作文我只看得懂標點符號，其他都是外星文。",o:[
+["conscientious 我沒拼錯，你看不懂吧。",3,"我……那是你字太醜！Handwriting 也是英文的一部分！"],
+["看不懂的地方可以直接問我啊老師。",2,"問你？我寧願問翻譯軟體，它都比你可靠。"],
+["我的字比較醜啦……下次會寫工整。",1,"不只字醜，內容也醜，very consistent。"],
+["其實那篇是我用翻譯軟體寫的啦。",0,"Finally, some honesty。難怪讀起來像家電說明書。"]]},
+{t:"我教書二十年，什麼學生沒見過？你這種的我閉著眼睛都能搞定。",o:[
+["二十年用同一份講義，閉眼確實能教。",3,"Classic is classic！好教材是 timeless 的！你懂什麼叫 timeless 嗎？"],
+["那老師怎麼還在這邊跟我吵這麼久？",2,"我這是在 entertain 你。給你面子你不要。"],
+["二十年喔……真的好久好久喔。",1,"比你的專注力長一點點。大概長了二十年。"],
+["老師你今年到底幾歲了啊？好好奇。",0,"Rude！在西方問年紀很沒禮貌！你連 culture 都沒學會！"]]},
+{t:"全班就你最吵。你要不要乾脆上來教？",o:[
+["好啊，至少我不會講半節課的漢堡。",3,"那是 cultural immersion！是 authentic material！你們這些不懂欣賞的……"],
+["我只是在問問題而已，這不算吵吧。",2,"你的問題比你的答案還多，這本身就是問題。"],
+["我……我會小聲一點，對不起嘛。",1,"最好是靜音。Mute。你知道 mute 吧？"],
+["我上去教，你會被我教到哭喔！",0,"哭？我會笑到哭吧。Hahaha，so cute。"]]},
+{t:"Excuse me？你剛剛是在翻白眼嗎？我看到了喔。",o:[
+["黑板 there 該寫 their，我眼睛自己翻。",3,"……值日生擦一下黑板！這是隨堂測驗，看你們有沒有 pay attention！"],
+["我只是眼睛有點癢，不是翻白眼。",2,"眼睛癢？我看是皮在癢吧。"],
+["沒有啦……我真的沒有翻白眼。",1,"有。我視力 20/20，我什麼都看得到。"],
+["有啊，就是在翻你白眼，怎樣？",0,"怎樣？很好，操行扣分。Behavior 也是成績喔。"]]},
+{t:"你們這一代就是被手機寵壞，連 spelling 都要靠 auto-correct。",o:[
+["老師寄家長的信寫 Dear Parnets 耶。",3,"那是……手機鍵盤太小！而且家長都看得懂！Context, OK？"],
+["工具本來就是拿來用的，又沒犯法。",2,"那你讓手機去考試好了，它說不定考得比你高。"],
+["我也有在背單字啦……只是會忘。",1,"背了什麼？背了忘、忘了背？"],
+["What is spelling？可以拼給我聽嗎？",0,"S-P-E-L-L-I-N-G。我拼給你聽了，你還是不會。"]]},
+{t:"我不是針對你。我是說在座各位英文都很爛，但你最爛。",o:[
+["全班都很爛的話，該檢討的是誰呢？",3,"……這、這是 sampling bias！你們這班是特例！Exception！"],
+["那老師為什麼每次都一直點我？",2,"因為你最有 improvement space。我是說得好聽一點。"],
+["我真的有那麼爛嗎……好難過喔。",1,"你要 honest answer 還是 polite answer？算了，兩個都是 yes。"],
+["我不爛！我只是……比較不好而已。",0,"「比較不好」就是爛的 polite version。Thank you for agreeing。"]]},
+{t:"你知道我為什麼不給你高分嗎？因為我有 standards。",o:[
+["老師的標準是看誰有買你的參考書吧？",3,"你……你這是 defamation！那本書是 optional！Optional 你懂嗎？！"],
+["那個標準可以寫出來給我們看嗎？",2,"Standards 不是寫出來的，是用 feel 的。你感覺不到，就是不夠格。"],
+["那我要怎樣才能拿高分……拜託。",1,"Try harder。再 harder 一點。Harder than that。"],
+["我請老師喝飲料，可以加分嗎？",0,"Bribery？我要記下來。不過……你要買哪一家？……Never mind！"]]},
+{t:"你這種程度出國，連點餐都會點錯，最後只能用手指菜單。",o:[
+["老師在美國的照片，每張都在吃潛艇堡。",3,"那是 healthy choice！是 lifestyle！你……你到底翻了我多少照片？！"],
+["點錯就點錯，又不會怎樣，再點就好。",2,"不會怎樣，但會丟臉。丟全班的臉。"],
+["那我先回家練習怎麼點餐好了……",1,"先練 excuse me 跟 sorry 吧，你會很常用到。"],
+["I want a hamburger, please give me.",0,"Give you what？我只想 give you a zero。"]]},
+{t:"你剛剛說「I am agree」是認真的嗎？我需要坐下來冷靜一下。",o:[
+["老師說 I am boring 時，我們也很冷靜。",3,"我是說 bored！我……我那是在示範常見錯誤！Teaching moment！"],
+["只是口誤一下而已嘛，幹嘛那麼誇張。",2,"你的口誤比你的正確率還高，那就不叫口誤了。"],
+["那……I am agreeing？這樣對嗎？",1,"Worse。你越修越歪。"],
+["I am very agree with you, teacher.",0,"……I need a vacation。Right now。"]]},
+{t:"上課不專心的人，以後只能去當網紅騙小孩。",o:[
+["你頻道 37 訂閱，30 個是被逼的我們。",3,"那是 early stage！Every big channel started small！……還有，不准退訂！"],
+["網紅賺得比老師多吧，聽起來不錯啊。",2,"錢不是一切，education is priceless。priceless 不是不值錢的意思喔，跟你不一樣。"],
+["我沒有要當網紅啦……我會專心。",1,"Good。你也紅不起來。"],
+["大家記得按讚訂閱開啟小鈴鐺！",0,"……你現在是在嘲諷我嗎？Detention。"]]},
+{t:"你寫「I go to school yesterday」。昨天是過去式！過去式！你的腦袋停在現在式嗎？",o:[
+["一直停在過去式的，是講美國的老師吧。",3,"……那、那叫 nostalgia！是很 sophisticated 的情緒！"],
+["意思有到就好了啦，大家都看得懂。",2,"你的意思到了，我的血壓也到了。"],
+["那……I goed to school？這樣嗎？",1,"Goed。很好，你發明了新單字，字典應該頒獎給你。"],
+["可是我昨天根本沒有去學校啊。",0,"……那你寫什麼 go to school？你連說謊都寫錯時態。"]]},
+{t:"我說的話你最好記下來，以後出社會你會感謝我。",o:[
+["我全部都錄音了，家長會要放嗎？",3,"你……你錄音？！That's illegal！……是吧？……我們、我們好好談一下……"],
+["出社會我應該只會記得老師很兇。",2,"兇是一種 love language，你以後會懂。"],
+["好……我會記下來，每一句都記住。",1,"Good。記在你那本什麼都沒寫的筆記本上。"],
+["那可以借我抄一下老師的筆記嗎？",0,"我的筆記是 premium content，你付不起。"]]}
+];
+const INTRO=[
+"Good morning, class～ 喔不對，是 good morning「大部分的」class。",
+"你。對，就是你啦親愛的。上次期中考 38 分那位～",
+"聽說你在背後說我英文「沒有很厲害」？蛤～？Excuse me？",
+"我留過美、我教書二十年，我的發音連手機語音助理都聽得懂好嗎。",
+"你如果覺得我哪裡說錯了——"
+];
+const SILENCE=["怎麼不說話了～？Cat got your tongue？","Hello～？有人在嗎？還是你的腦袋還在 loading？","沉默是金，但你的沉默是廢鐵喔親愛的。","Speechless？咩～我就知道。"];
+const FINAL=["咩哈哈哈～沒話說了吧？That's what I thought～","Game over, sweetie～ 回去把 grammar 練好再來找我。","這就是 native-level 的實力。你，還差得遠呢～","下課～ 記得把今天的屈辱寫成英文作文，三百字喔。"];
+const GRADES={3:["神回！","✓",true],2:["普通","△",false],1:["太弱","✗",false],0:["自爆","✗",false],"-1":["沉默","…",false]};
+const MOODS={3:["破防",'cool','panic'],2:["冷笑",'','sneer'],1:["得意",'hot','smug'],0:["笑到流淚",'hot','laugh'],"-1":["囂張",'hot','smug']};
+const RANKS=[[0,"當場陣亡"],[3,"勉強應戰"],[6,"頂嘴新秀"],[10,"教務處常客"],[15,"辯論社王牌"],[20,"Dylan 剋星"],[30,"英文科傳說"]];
+
+const $=id=>document.getElementById(id);
+const tpl=$('sheepTpl');
+function mount(id){const c=$(id);c.appendChild(tpl.content.cloneNode(true));return c.querySelector('svg')}
+const SHEEP={intro:mount('avIntro'),play:mount('avPlay'),over:mount('avOver')};
+function face(w,m){SHEEP[w].setAttribute('class','sheep m-'+m)}
+face('intro','talk');
+let best=0; try{best=+localStorage.getItem('kevin-best')||0}catch(e){}
+$('best').textContent=best;
+
+let autoT=null, introT=null, S, typer=null, skipType=false, timerRAF=null, timerStart=0, timerDur=0, phase='intro', introIdx=0;
+
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a}
+function newGame(){S={hp:100,round:0,wins:0,combo:0,maxCombo:0,deck:shuffle(ROUNDS.map((_,i)=>i)),survived:0}}
+function mult(){return 1+Math.floor(S.round/4)*.15}
+function setHP(v){S.hp=Math.max(0,Math.min(100,Math.round(v)));$('hpFill').style.width=S.hp+'%';$('hpNum').textContent=S.hp;$('ruler').classList.toggle('low',S.hp<=30)}
+function show(id){['intro','play','over'].forEach(s=>$(s).hidden=s!==id);$('board').hidden=id==='play'}
+
+function typeInto(el,text,done,av){
+  clearInterval(typer);skipType=false;el.textContent='';let i=0;
+  document.querySelectorAll('.avatar').forEach(a=>a.classList.remove('talking'));
+  if(av)$(av).classList.add('talking');
+  typer=setInterval(()=>{i=skipType?text.length:i+1;el.textContent=text.slice(0,i);
+    if(i>=text.length){clearInterval(typer);typer=null;if(av)$(av).classList.remove('talking');done&&done()}},14);
+}
+
+/* ---------- intro ---------- */
+function introStep(){
+  clearTimeout(introT);
+  if(typer){skipType=true;return}
+  if(introIdx<INTRO.length){
+    const p=document.createElement('p');p.className='pen';$('introLines').appendChild(p);
+    typeInto(p,INTRO[introIdx++],()=>{introT=setTimeout(introStep,420)},'avIntro');
+    
+  }else if(introIdx===INTRO.length){
+    introIdx++;
+    const p=document.createElement('p');p.className='pen';p.style.fontWeight='700';p.style.fontSize='24px';$('introLines').appendChild(p);
+    face('intro','smug');typeInto(p,'不服來辯。',()=>{$('stampWrap').hidden=false;$('moodIntro').textContent='等你開口';$('moodIntro').className='mood hot';
+      $('introBtn').textContent='開始答辯';$('introHint').textContent='撐越多回合越強';});
+  }else{startGame()}
+}
+$('introBtn').onclick=introStep;
+introT=setTimeout(introStep,400);
+
+/* ---------- play ---------- */
+function startGame(){newGame();setHP(100);$('wins').textContent=0;show('play');phase='play';nextRound()}
+function nextRound(){
+  if(!S.deck.length)S.deck=shuffle(ROUNDS.map((_,i)=>i));
+  S.round++;S.cur=ROUNDS[S.deck.pop()];
+  $('roundNo').textContent=S.round;
+  // each line of trash talk wears you down
+  const drain=Math.round(3*mult());
+  if(S.round>1)setHP(S.hp-drain);
+  if(S.hp<=0){return gameOver()}
+  $('result').hidden=true;$('opts').innerHTML='';$('qlabel').style.visibility='hidden';
+  $('timerFill').style.transform='scaleX(1)';$('timer').classList.remove('urgent');
+  phase='typing';
+  face('play',S.round%3?'smug':'sneer');
+  typeInto($('say'),S.cur.t,showOptions,'avPlay');
+}
+$('sayBox').onclick=()=>{if(typer)skipType=true};
+
+function showOptions(){
+  phase='choose';$('qlabel').style.visibility='visible';
+  S.opts=shuffle(S.cur.o);
+  S.opts.forEach((o,i)=>{
+    const li=document.createElement('li');const b=document.createElement('button');b.className='opt';b.id='opt'+i;
+    b.innerHTML='<span class="bubble">'+'ABCD'[i]+'</span><span class="txt"></span>';
+    b.querySelector('.txt').textContent=o[0];
+    if(o[1]===3)b.dataset.best='1';
+    b.onclick=()=>choose(i);li.appendChild(b);$('opts').appendChild(li);
+  });
+  timerDur=Math.max(4,9-(S.round-1)*.25)*1000;timerStart=performance.now();tick();
+}
+function tick(){
+  const p=1-(performance.now()-timerStart)/timerDur;
+  $('timerFill').style.transform='scaleX('+Math.max(0,p)+')';
+  $('timer').classList.toggle('urgent',p<.3);
+  if(p<=0){timerRAF=null;return choose(-1)}
+  timerRAF=requestAnimationFrame(tick);
+}
+function choose(i){
+  if(phase!=='choose')return;phase='result';
+  cancelAnimationFrame(timerRAF);timerRAF=null;
+  let g,reply;
+  if(i<0){g=-1;reply=SILENCE[Math.random()*SILENCE.length|0]}
+  else{g=S.opts[i][1];reply=S.opts[i][2]}
+  document.querySelectorAll('.opt').forEach((b,j)=>{b.disabled=true;if(j===i)b.classList.add('picked');else b.classList.add('faded');if(b.dataset.best&&g!==3)b.classList.add('best')});
+  const m=mult();let d;
+  if(g===3){S.wins++;S.combo++;S.maxCombo=Math.max(S.maxCombo,S.combo);d=Math.max(2,10-Math.floor(S.round/5)*2)+(S.combo>=3?5:0)}
+  else{S.combo=0;d=-Math.round(({2:12,1:22,0:32,"-1":25})[g]*m)}
+  setHP(S.hp+d);$('wins').textContent=S.wins;
+  const [label,sym,ok]=GRADES[g];
+  $('mark').textContent=sym;$('mark').className='mark'+(ok?' ok':'');
+  $('grade').textContent=label;$('grade').className='grade'+(ok?' ok':'');
+  $('delta').textContent='底氣 '+(d>0?'+':'−')+Math.abs(d)+(g!==3&&m>1?'（老師火力 ×'+m.toFixed(2)+'）':'');
+  $('combo').textContent=S.combo>=3?'連續嗆贏 ×'+S.combo:'';
+  const [mood,cls,fm]=MOODS[g];$('mood').textContent=mood;$('mood').className='mood '+cls;face('play',fm);
+  // re-trigger stamp animation
+  const mk=$('mark');mk.style.animation='none';void mk.offsetWidth;mk.style.animation='';
+  $('result').hidden=false;
+  if(!ok){$('paper').classList.remove('shake');void $('paper').offsetWidth;$('paper').classList.add('shake')}
+  const lost=S.hp<=0;
+  $('nextBtn').textContent=lost?'……（說不出話）':'跳過 →';
+  typeInto($('reply'),reply,()=>{ autoT=setTimeout(advance,lost?1400:1100) },'avPlay');
+  if(!lost)S.survived=S.round;
+}
+function advance(){clearTimeout(autoT);if(phase!=='result')return;if(S.hp<=0)gameOver();else nextRound()}
+$('nextBtn').onclick=()=>{if(phase!=='result')return;if(typer){skipType=true;return}advance()};
+
+/* ---------- over ---------- */
+function gameOver(){
+  phase='over';show('over');
+  const n=S.survived;let isNew=false;
+  if(n>best){best=n;isNew=true;try{localStorage.setItem('kevin-best',best)}catch(e){}}
+  $('best').textContent=best;
+  $('finalScore').textContent=n;
+  let r=RANKS[0][1];RANKS.forEach(([min,t])=>{if(n>=min)r=t});$('rank').textContent=r;
+  $('stats').innerHTML='撐過 <b>'+n+'</b> 回合 · 神回 <b>'+S.wins+'</b> 次 · 最長連勝 <b>'+S.maxCombo+'</b><br>最高紀錄 <b>'+best+'</b> 回合'+(isNew?'　<span class="new">新紀錄！</span>':'');
+  face('over','laugh');
+  typeInto($('finalLine'),FINAL[Math.random()*FINAL.length|0],null,'avOver');
+  last={n,wins:S.wins};$('submitBox').hidden=true;offerSubmit();
+}
+$('againBtn').onclick=startGame;
+
+/* ---------- leaderboard ---------- */
+let LOCAL=false, DB=null, ME=null, myBest=null, myWins=0, myName='', last=null, boardRows=[];
+try{myName=localStorage.getItem('dylan-name')||''}catch(e){}
+function boardMsg(t){$('boardMsg').textContent=t;$('boardMsg').hidden=!t}
+function renderBoard(snap){
+  boardRows=snap.docs.map(d=>{const v=d.data()||{};return{id:d.id,name:(typeof v.name==='string'&&v.name.trim()?v.name:'無名氏').slice(0,12),best:Math.max(0,Math.min(999,+v.best||0)),wins:Math.max(0,Math.min(999,+v.wins||0))}});
+  const ol=$('boardList');ol.innerHTML='';
+  boardRows.forEach((r,i)=>{
+    const li=document.createElement('li');if(r.id===ME)li.className='me';
+    li.innerHTML='<span class="rk"></span><span class="nm"></span><span class="sc"></span>';
+    li.querySelector('.rk').textContent=i+1;
+    const nm=li.querySelector('.nm');nm.textContent=r.name;if(r.id===ME){const s=document.createElement('small');s.textContent='你';nm.appendChild(s)}
+    const sc=li.querySelector('.sc');sc.textContent=r.best;const sm=document.createElement('small');sm.textContent='回合 · 神回 '+r.wins;sc.appendChild(sm);
+    ol.appendChild(li);
+  });
+  boardMsg(boardRows.length?'':'還沒有人上榜。第一個被 Dylan 嘴爆的就是你。');
+}
+(async()=>{
+  try{
+    if(!window.claude||!window.claude.use){return setupLocal()}
+    const [db,user]=await Promise.all([claude.use('db'),claude.use('user')]);
+    if(!db||!user){return setupLocal()}
+    DB=db;ME=await user.id();
+    try{const mine=await db.doc('scores/'+ME).get();
+      if(mine.exists){const d=mine.data()||{};myBest=+d.best||0;myWins=+d.wins||0;if(!myName&&typeof d.name==='string')myName=d.name}}catch(e){}
+    $('nameInput').value=myName;
+    db.collection('scores').orderBy('best','desc').limit(10).onSnapshot(renderBoard,()=>boardMsg('排行榜暫時連不上，重新整理再試試。'));
+    if(last&&phase==='over')offerSubmit();
+  }catch(e){setupLocal()}
+})();
+/* per-device leaderboard when the shared one isn't available (e.g. GitHub Pages) */
+function loadLocal(){try{const a=JSON.parse(localStorage.getItem('dylan-board')||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}}
+function saveLocal(a){try{localStorage.setItem('dylan-board',JSON.stringify(a))}catch(e){}}
+function renderLocal(){
+  const rows=loadLocal().sort((a,b)=>b.best-a.best||b.wins-a.wins).slice(0,10);
+  renderBoard({docs:rows.map(r=>({id:'n:'+r.name,data:()=>r}))});
+  if(!rows.length)boardMsg('還沒有人上榜。這是這台裝置上的排行榜，借給同學玩也會記在這裡。');
+}
+function setupLocal(){
+  if(LOCAL)return;LOCAL=true;
+  $('board').querySelector('.hint').textContent='這台裝置上的前 10 名，同一個暱稱只留最佳紀錄';
+  $('nameInput').value=myName;ME=myName?'n:'+myName:null;
+  renderLocal();
+  if(last&&phase==='over')offerSubmit();
+}
+function offerSubmit(){
+  if(!last||(!LOCAL&&(!DB||!ME)))return;
+  if(LOCAL){$('submitBox').hidden=false;$('submitBtn').disabled=false;$('submitBtn').textContent='上榜';$('submitMsg').textContent='輸入暱稱就能上榜（借給同學玩請換他的名字）。';return}
+  $('submitBox').hidden=false;$('submitBtn').disabled=false;$('submitBtn').textContent='上榜';
+  if(myBest!==null&&last.n<=myBest){$('submitMsg').textContent='你的最佳是 '+myBest+' 回合，這次沒超過。可以改暱稱再按一次。';$('submitBtn').textContent='更新暱稱';return}
+  $('submitMsg').textContent=myBest===null?'輸入暱稱就能上榜。':'破你自己的紀錄了！';
+  if(myName)submitScore();
+}
+async function submitScore(){
+  if(!last)return;
+  const name=($('nameInput').value.trim()||'無名氏').slice(0,12);
+  if(LOCAL){
+    if($('submitBtn').textContent==='已上榜')return;
+    const a=loadLocal();const ex=a.find(r=>r.name===name);
+    if(ex){if(last.n>ex.best){ex.best=last.n;ex.wins=last.wins}}else a.push({name,best:last.n,wins:last.wins});
+    saveLocal(a);myName=name;ME='n:'+name;try{localStorage.setItem('dylan-name',name)}catch(e){}
+    renderLocal();
+    const p=boardRows.findIndex(r=>r.id===ME);const b=(ex?ex.best:last.n);
+    $('submitBtn').textContent='已上榜';$('submitBtn').disabled=true;
+    $('submitMsg').textContent=name+' 的最佳是 '+b+' 回合'+(p>=0?'，目前第 '+(p+1)+' 名。':'，還沒擠進前 10。');
+    return;
+  }
+  if(!DB||!ME)return;
+  const better=myBest===null||last.n>myBest;
+  const best=better?last.n:myBest, wins=better?last.wins:myWins;
+  $('submitBtn').disabled=true;$('submitMsg').textContent='上傳中……';
+  try{
+    await DB.doc('scores/'+ME).set({name,best,wins,at:Date.now()});
+    myBest=best;myWins=wins;myName=name;try{localStorage.setItem('dylan-name',name)}catch(e){}
+    const pos=boardRows.findIndex(r=>r.id===ME);
+    $('submitMsg').textContent='已上榜：'+name+'，最佳 '+best+' 回合。';
+    $('submitBtn').textContent='已上榜';
+    setTimeout(()=>{const p=boardRows.findIndex(r=>r.id===ME);$('submitMsg').textContent='已上榜：'+name+'，最佳 '+best+' 回合'+(p>=0?'，目前第 '+(p+1)+' 名。':'，還沒擠進前 10。')},900);
+  }catch(e){$('submitBtn').disabled=false;$('submitMsg').textContent=e&&e.code==='not_granted'?'你只有檢視權限，沒辦法上榜。請分享者給你可互動的權限。':'上傳失敗，再按一次試試。'}
+}
+$('submitBtn').onclick=submitScore;
+$('nameInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.stopPropagation();submitScore()}});
+
+/* ---------- keys ---------- */
+document.addEventListener('keydown',e=>{
+  if(e.target&&e.target.tagName==='INPUT')return;
+  const k=e.key.toLowerCase();
+  if(phase==='intro'&&(k==='enter'||k===' ')){e.preventDefault();introStep()}
+  else if(phase==='typing'&&(k==='enter'||k===' ')){e.preventDefault();skipType=true}
+  else if(phase==='choose'){const idx='abcd'.indexOf(k)>=0?'abcd'.indexOf(k):'1234'.indexOf(k);if(idx>=0&&idx<4){e.preventDefault();choose(idx)}}
+  else if(phase==='result'&&(k==='enter'||k===' ')&&document.activeElement!==$('nextBtn')){e.preventDefault();$('nextBtn').click()}
+});
+})();
+</script>
+
+</body>
+</html>
